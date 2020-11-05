@@ -32,9 +32,23 @@
       shell:
         sudo apt install elasticsearch -y
         
-    - name: Elasticsearch service will not start automatically after the installation process is complete. Let's start the service and enable it
+    - name: Daemon reload
+      shell:        
+        sudo systemctl daemon-reload
+
+    - name: add the Elasticsearch repository to the system
       shell:
-        sudo systemctl enable --now elasticsearch.service
+        sudo systemctl enable elasticsearch
+        
+        
+    - name: Start Elasticsearch
+      shell:
+        sudo systemctl start elasticsearch      
+        
+        
+    - name: Status of Elasticsearch
+      shell:
+        sudo systemctl status elasticsearch           
 
     - name: curl to send an HTTP request to port 9200 on localhost
       shell:        
