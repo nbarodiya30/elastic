@@ -13,8 +13,8 @@
     - name: Create an ec2 instance
       ec2:
          key_name: "{{ keypair }}"
-         aws_access_key: "AKIAIBEB2NIGR7JWIUPQ"
-         aws_secret_key: "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"
+         aws_access_key: ""
+         aws_secret_key: ""
          group: launch-wizard-1  # security group name
          instance_type: "{{ instance_type}}"
          image: "{{ ami }}"
