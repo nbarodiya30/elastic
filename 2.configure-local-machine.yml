@@ -1,0 +1,40 @@
+- name: Let's Install required packages on Local
+  hosts: 127.0.0.1
+  gather_facts: False
+  become: true
+  become_method: sudo
+  become_user: ubuntu
+
+  tasks:
+
+    - name: Generate an OpenSSH keypair with the default values (4096 bits, rsa)
+      openssh_keypair:
+        path: /home/ubuntu/.ssh/id_rsa
+        owner: ubuntu
+        group: ubuntu
+
+
+    - name: upgrade 
+      shell:
+        sudo apt-get upgrade -y
+        
+    - name: python3
+      shell:
+        sudo apt install python3 -y
+
+    - name: install boto 
+      shell:        
+        pip3 install boto
+
+        
+    - name: Install Curl
+      shell:
+        sudo apt install curl  
+        
+
+    - name: Add in inventory file
+      lineinfile:
+        path: /etc/ansible/hosts
+        insertafter: '^\[hosts1\]'
+        line: "[elastic]"
+        state: present

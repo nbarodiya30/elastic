@@ -1,0 +1,52 @@
+- name: Let's Install ElasticSearch
+  hosts: elastic
+  gather_facts: False
+  become: true
+  become_method: sudo
+  become_user: ubuntu
+
+  tasks:
+
+    - name: update ubuntu
+      shell:
+        sudo apt update -y
+        
+    - name: update ubuntu
+      shell:
+        sudo apt update -y
+        
+    - name: Install the dependencies necessary to add a new HTTPS repository
+      shell:
+        sudo apt install apt-transport-https ca-certificates wget -y
+
+    - name: Import the repository’s GPG key
+      shell:        
+        wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+    - name: add the Elasticsearch repository to the system
+      shell:
+        sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list' 
+        
+        
+    - name: install Elasticsearch
+      shell:
+        sudo apt install elasticsearch -y
+        
+    - name: Elasticsearch service will not start automatically after the installation process is complete. Let's start the service and enable it
+      shell:
+        sudo systemctl enable --now elasticsearch.service
+
+    - name: curl to send an HTTP request to port 9200 on localhost
+      shell:        
+        curl -X GET "localhost:9200/"
+
+    - name: view the messages logged by the Elasticsearch service
+      shell:
+        sudo journalctl -u elasticsearch
+
+    - name: Add in inventory file
+      lineinfile:
+        path: /etc/ansible/hosts
+        insertafter: '^\[hosts1\]'
+        line: "[elastic]"
+        state: present

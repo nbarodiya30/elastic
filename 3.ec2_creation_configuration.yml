@@ -1,0 +1,76 @@
+- name: Create a new Demo EC2 instance
+  hosts: 127.0.0.1
+  gather_facts: False
+
+  vars:
+      region: us-east-1
+      instance_type: t2.micro
+      ami: ami-0817d428a6fb68645  # Ubuntu
+      keypair: n # pem file name
+
+  tasks:
+
+    - name: Create an ec2 instance
+      ec2:
+         key_name: "{{ keypair }}"
+         aws_access_key: "AKIAILNMAKS6LRGOB6OQ"
+         aws_secret_key: "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"
+         group: launch-wizard-1  # security group name
+         instance_type: "{{ instance_type}}"
+         image: "{{ ami }}"
+         wait: true
+         region: "{{ region }}"
+         count: 1  # default
+         count_tag:
+            Name: "Demo-Elasticsearch"
+         instance_tags:
+            Name: "Demo-Elasticsearch"
+         vpc_subnet_id: "subnet-0f4ae550"
+         assign_public_ip: yes
+      register: ec2
+
+
+    - name: Add instance to host group
+      add_host:
+        hostname:  "{{ item.private_ip }}"
+        groups:
+        - launched
+      with_items: "{{ ec2.instances }}"
+
+    - debug:
+        msg: Remote IP is "{{ item.public_ip }}"
+      with_items: "{{ec2.instances }}"
+
+    - name: Add in inventory file
+      lineinfile:
+        path: /etc/ansible/hosts
+        insertafter: '^[elastic]'
+        line: "{{ item.private_ip }}"
+      with_items: "{{ec2.instances }}"
+
+    - local_action: "wait_for host={{ item.public_ip }} port=22 state=started"
+      name: "Wait for EC2 Instance to Spin-up and ready for SSH access"
+      with_items: "{{ec2.instances }}"
+      
+     
+    - name: SSH Key Export
+      shell: cat ~/.ssh/id_rsa.pub | ssh -i /tmp/elastic/n.pem ubuntu@{{ item.private_ip }} "cat >> ~/.ssh/authorized_keys"
+      become_user: ubuntu
+      delegate_to: localhost
+      with_items: "{{ ec2.instances }}"
+
+    - name: Install Python
+      shell:
+        ssh -i /tmp/elastic/n.pem ubuntu@{{ item.private_ip }}
+        sudo apt install python3 -y
+      with_items: "{{ ec2.instances }}"
+
+    - name: Refresh Inventory
+      meta: refresh_inventory   
+      
+
+
+
+      
+      
+      
