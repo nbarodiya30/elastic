@@ -21,9 +21,13 @@
     - name: python3
       shell:
         sudo apt install python3 -y
+        
+    - name: python3-pip
+      shell:
+        apt install python3-pip       
 
     - name: install boto 
-      shell:        
+      shell:                        
         pip3 install boto
 
         
