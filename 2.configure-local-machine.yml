@@ -14,21 +14,6 @@
         group: ubuntu
 
 
-    - name: upgrade 
-      shell:
-        sudo apt-get upgrade -y
-        
-    - name: python3
-      shell:
-        sudo apt install python3 -y
-        
-    - name: python3-pip
-      shell:
-        apt install python3-pip       
-
-    - name: install boto 
-      shell:                        
-        pip3 install boto
 
         
     - name: Install Curl
