@@ -1,3 +1,3 @@
 #!/bin/bash
-ansible-playbook 3.ec2_creation_configuration.yml
+ansible-playbook aws-machine.yml
 exit 0
